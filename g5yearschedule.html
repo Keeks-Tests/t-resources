@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lifted Academy - Full Year Science Lesson Planner</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
@@ -13,7 +12,6 @@
       .expanded-print { display: block !important; }
       svg.chevron { display: none !important; }
     }
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -22,7 +20,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans flex flex-col">
 
-  <!-- Header Section -->
   <header class="bg-gradient-to-r from-teal-800 to-emerald-900 text-white shadow-md no-print">
     <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-3">
@@ -45,7 +42,6 @@
     </div>
   </header>
 
-  <!-- Notification Banner -->
   <div id="notificationBanner" class="hidden max-w-7xl mx-auto w-full px-4 pt-4 no-print">
     <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -60,15 +56,40 @@
     </div>
   </div>
 
-  <!-- Interactive Controls Area -->
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
     
     <!-- Settings Sidebar -->
     <div class="space-y-6 lg:col-span-1 no-print">
-      <!-- Rotation Configuration -->
+      
+      <!-- Lesson Filtering (NEW) -->
       <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
         <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          Lesson Filters
+        </h3>
+        <p class="text-[11px] text-slate-500 mb-3">Unchecking items will remove them from the calendar and auto-condense the remaining lessons.</p>
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition border border-slate-100">
+            <input type="checkbox" id="toggleExp" checked onchange="toggleLessonTypes()" class="text-emerald-600 focus:ring-emerald-500 rounded h-4 w-4">
+            <span class="text-xs font-semibold text-slate-700">Include "Exploration" Labs</span>
+          </label>
+          <label class="flex items-center gap-3 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition border border-slate-100">
+            <input type="checkbox" id="toggleStem" checked onchange="toggleLessonTypes()" class="text-emerald-600 focus:ring-emerald-500 rounded h-4 w-4">
+            <span class="text-xs font-semibold text-slate-700">Include "STEM" Projects</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Checklist Area -->
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-4">Hands-on Checklist</h3>
+        <div id="sidebarChecklist" class="space-y-2"></div>
+      </div>
+
+      <!-- Pacing Settings -->
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           Pacing Configurations
         </h3>
         
@@ -86,16 +107,16 @@
         <div class="space-y-2">
           <label class="flex items-start gap-3 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
             <input type="radio" name="rot_style" value="slide" checked onchange="setRotationStyle('slide')" class="mt-1 text-emerald-600 focus:ring-emerald-500">
-            <span class="text-xs text-slate-600"><strong>Slide (Recommended):</strong> Holidays shift the cycle (e.g., if Fri was A, next Tue is B). Keeps blocks balanced.</span>
+            <span class="text-xs text-slate-600"><strong>Slide (Recommended):</strong> Holidays shift the cycle. Keeps blocks balanced.</span>
           </label>
           <label class="flex items-start gap-3 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
             <input type="radio" name="rot_style" value="fixed" onchange="setRotationStyle('fixed')" class="mt-1 text-emerald-600 focus:ring-emerald-500">
-            <span class="text-xs text-slate-600"><strong>Fixed:</strong> Alternating sequence skips days that fall on school closures.</span>
+            <span class="text-xs text-slate-600"><strong>Fixed:</strong> Sequence skips days that fall on school closures.</span>
           </label>
         </div>
       </div>
 
-      <!-- Live Statistics / Progress Tracking -->
+      <!-- Live Statistics -->
       <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
         <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-4">
           Yearly Pace Tracker
@@ -116,8 +137,8 @@
               <span id="statScienceBlocks" class="text-lg font-extrabold text-teal-600">0</span>
             </div>
             <div>
-              <span class="block text-xs text-slate-400">Chapters Active</span>
-              <span class="text-lg font-extrabold text-emerald-600">12</span>
+              <span class="block text-xs text-slate-400">Lessons Loaded</span>
+              <span id="statActiveLessons" class="text-lg font-extrabold text-emerald-600">0</span>
             </div>
           </div>
           <div class="space-y-2">
@@ -125,32 +146,20 @@
               Reset All Canceled Days
             </button>
             <button onclick="resetAllAdjustments()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg transition">
-              Reset Pushes / Pulls
+              Reset Manual Pushes / Pulls
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Materials List Box -->
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-3">
-          Tactile Setup Checklist
-        </h3>
-        <p class="text-xs text-slate-400 mb-4">Prepare these physical classroom assets in advance since online portals are unavailable.</p>
-        <div id="sidebarChecklist" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
-          <!-- Dynamic checklist generated here -->
         </div>
       </div>
     </div>
 
     <!-- Main Content Schedule Grid -->
     <div class="lg:col-span-3 space-y-6">
-      <!-- Title Card -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Expandable View Matrix</span>
+          <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Dynamic View Matrix</span>
           <h2 class="text-2xl font-bold text-slate-800 mt-2">Active Multi-Lesson Yearly Planner</h2>
-          <p class="text-sm text-slate-500 mt-1">Click any Science Day to expand and view specific resources, materials, and homework.</p>
+          <p class="text-sm text-slate-500 mt-1">Click any Science Day to expand and view specific resources, materials, and editable homework.</p>
         </div>
         <div class="flex items-center gap-3 no-print w-full md:w-auto">
           <label class="text-xs font-bold text-slate-500 uppercase">View Quarter:</label>
@@ -164,7 +173,6 @@
         </div>
       </div>
 
-      <!-- Full Schedule Visualizer -->
       <div id="scheduleContainer" class="space-y-6">
         <!-- Dynamic Weeks will render here -->
       </div>
@@ -175,19 +183,20 @@
   <footer class="bg-slate-800 text-slate-400 py-6 text-center text-xs mt-auto border-t border-slate-700">
     <div class="max-w-7xl mx-auto px-4">
       <p>Data mapped against <strong>Lifted Academy School Calendar (DOC042726-1.pdf)</strong> for all 4 Quarters.</p>
-      <p class="mt-2 text-slate-500">&copy; 2026 Lifted Academy. Built for manual offline alignment strategies.</p>
+      <p class="mt-2 text-slate-500">&copy; 2026 Lifted Academy. Engine built for dynamic chunking and offline alignment.</p>
     </div>
   </footer>
 
-  <!-- JavaScript Scheduler Application Engine -->
   <script>
     let state = {
       scienceDay: 'A',
       rotationStyle: 'slide',
       lostDays: [],
       adjustments: {},
-      expandedDays: {}, // Tracks which days are toggled open
-      customHomework: {} // Tracks user-edited homework text
+      expandedDays: {}, 
+      customHomework: {},
+      includeExp: true,
+      includeStem: true
     };
 
     const chapterColorTheme = {
@@ -199,108 +208,214 @@
       6: { bg: "bg-sky-50 border-sky-500", titleColor: "text-sky-950", quizBadge: "bg-sky-200 text-sky-800", amberBorder: "sky-200/60" },
       7: { bg: "bg-indigo-50 border-indigo-500", titleColor: "text-indigo-950", quizBadge: "bg-indigo-200 text-indigo-800", amberBorder: "indigo-200/60" },
       8: { bg: "bg-orange-50 border-orange-500", titleColor: "text-orange-950", quizBadge: "bg-orange-200 text-orange-800", amberBorder: "orange-200/60" },
+      9: { bg: "bg-pink-50 border-pink-500", titleColor: "text-pink-950", quizBadge: "bg-pink-200 text-pink-800", amberBorder: "pink-200/60" },
+      10: { bg: "bg-cyan-50 border-cyan-500", titleColor: "text-cyan-950", quizBadge: "bg-cyan-200 text-cyan-800", amberBorder: "cyan-200/60" },
+      11: { bg: "bg-lime-50 border-lime-500", titleColor: "text-lime-950", quizBadge: "bg-lime-200 text-lime-800", amberBorder: "lime-200/60" },
+      12: { bg: "bg-teal-50 border-teal-500", titleColor: "text-teal-950", quizBadge: "bg-teal-200 text-teal-800", amberBorder: "teal-200/60" },
+      13: { bg: "bg-fuchsia-50 border-fuchsia-500", titleColor: "text-fuchsia-950", quizBadge: "bg-fuchsia-200 text-fuchsia-800", amberBorder: "fuchsia-200/60" },
+      14: { bg: "bg-yellow-50 border-yellow-500", titleColor: "text-yellow-950", quizBadge: "bg-yellow-200 text-yellow-800", amberBorder: "yellow-200/60" },
+      15: { bg: "bg-red-50 border-red-500", titleColor: "text-red-950", quizBadge: "bg-red-200 text-red-800", amberBorder: "red-200/60" },
       generic: { bg: "bg-slate-100 border-slate-400", titleColor: "text-slate-900", quizBadge: "bg-slate-200 text-slate-800", amberBorder: "slate-300" },
       review: { bg: "bg-slate-50 border-slate-400", titleColor: "text-slate-950", quizBadge: "bg-slate-200 text-slate-800", amberBorder: "slate-200/60" }
     };
 
-    // STRICT PACING APPLIED: 2 lessons if Quiz, 1 Lesson if Test, 3-4 default.
-    let curriculumBlocks = [
-      // CHAPTER 1
-      { id: "C1_1", chapterNum: 1, title: "Chapter 1: About Matter", lessons: "Lessons 1-2", quizText: "Quiz 1A", textbookPages: "Pages 2-14", activityPages: "Study Guide (9-11), Safety Tips (4)", teacherPages: "IA 1.1, IA 1.2", description: "Introduction to matter, measuring volume, density calculations, and Quiz 1A.", materials: ["Centimeter rulers", "Cube-shaped wooden blocks"] },
-      { id: "C1_2", chapterNum: 1, title: "Chapter 1: About Matter", lessons: "Lessons 3-5", quizText: "Quiz 1B", textbookPages: "Pages 15-23", activityPages: "Study Guide (17-19)", teacherPages: "IA 1.5, IA 1.1 Key", description: "Atoms vs elements, states of matter, physical properties, and Quiz 1B.", materials: ["Colored interlocking blocks", "Syringe/Rose test set"] },
-      { id: "C1_3", chapterNum: 1, title: "Chapter 1: About Matter", lessons: "Lessons 6-9", quizText: "", textbookPages: "Pages 24-25", activityPages: "Exp: Ph'antastic (21-23), STEM: Float a Boat (25-27)", teacherPages: "IA 1.7, IA 1.8", description: "Engineering design process and boat testing.", materials: ["Model boat structural scraps", "Large testing tub"] },
-      { id: "C1_4", chapterNum: 1, title: "Chapter 1: About Matter", lessons: "Lessons 10-11", quizText: "Test 1", textbookPages: "Review & Test", activityPages: "Quizzes 1A-1B Review", teacherPages: "None", description: "Synthesized review day followed by Test 1.", materials: ["Printed Test 1 Sheets", "Vocabulary cards"] },
-
-      // CHAPTER 2
-      { id: "C2_1", chapterNum: 2, title: "Chapter 2: Changes in Matter", lessons: "Lessons 12-13", quizText: "Quiz 2A", textbookPages: "Pages 26-32", activityPages: "Study Guide (29-30), Inv: Matter (31-32)", teacherPages: "IA 2.1, IA 2.2", description: "Physical changes and conservation of mass. Includes Quiz 2A.", materials: ["Ice cubes in clear plastic cups", "Twisting balloons"] },
-      { id: "C2_2", chapterNum: 2, title: "Chapter 2: Changes in Matter", lessons: "Lessons 14-16", quizText: "Quiz 2B", textbookPages: "Pages 33-38", activityPages: "Study Guide (33-34), Inv: Separating (35-37)", teacherPages: "IA 1.2", description: "Heterogeneous mixtures and separating properties. Includes Quiz 2B.", materials: ["Snack mix in resealable bags", "Tea bags"] },
-      { id: "C2_3", chapterNum: 2, title: "Chapter 2: Changes in Matter", lessons: "Lessons 17-18", quizText: "Quiz 2C", textbookPages: "Pages 38-43", activityPages: "Inq: More Mixtures (39-41), Study Guide (43-44)", teacherPages: "None", description: "Homogeneous mixtures and solutions. Includes Quiz 2C.", materials: ["Physical mixtures separation kit", "Index cards"] },
-      { id: "C2_4", chapterNum: 2, title: "Chapter 2: Changes in Matter", lessons: "Lessons 19-20", quizText: "", textbookPages: "Pages 44-45", activityPages: "Exp: Fizz (45-48), Inv: Disappearing (49-50)", teacherPages: "None", description: "Solubility factors and surface area investigations.", materials: ["Soft drink bottles", "Solute dissolving supplies"] },
-      { id: "C2_5", chapterNum: 2, title: "Chapter 2: Changes in Matter", lessons: "Lessons 21-22", quizText: "Quiz 2D", textbookPages: "Pages 46-51", activityPages: "Study Guide (51-52), Inv: A+B=WHAT (53-55)", teacherPages: "IA 1.5", description: "Chemical changes vs physical changes. Includes Quiz 2D.", materials: ["Candles", "Candle holders", "Matches", "Chemical change reagents"] },
-      { id: "C2_6", chapterNum: 2, title: "Chapter 2: Changes in Matter", lessons: "Lessons 23-24", quizText: "Test 2", textbookPages: "Review & Test", activityPages: "Study Guides Chapter 2", teacherPages: "None", description: "Interactive Chapter 2 review and physical printed Test 2.", materials: ["Chapter 2 Study Guides", "Printed Test 2 Sheets"] },
-
-      // CHAPTER 3
-      { id: "C3_1", chapterNum: 3, title: "Chapter 3: Ecosystems", lessons: "Lessons 25-27", quizText: "Quiz 3A", textbookPages: "Pages 52-64", activityPages: "Study Guide (59-61), STEM: Terrarium (63-65)", teacherPages: "IA 3.1", description: "Ecosystem organization and terrarium modeling. Includes Quiz 3A.", materials: ["Ecosystem map references", "Pebbles/soil", "Small moss chunks"] },
-      { id: "C3_2", chapterNum: 3, title: "Chapter 3: Ecosystems", lessons: "Lessons 28-29", quizText: "Quiz 3B", textbookPages: "Pages 65-71", activityPages: "Study Guide (69-72), Exp: Competitions (73-76)", teacherPages: "IA 3.2, IA 3.3, IA 3.4", description: "Food chains, food webs, and energy competition. Includes Quiz 3B.", materials: ["Food chain card deck", "10 cm yarn pieces"] },
-      { id: "C3_3", chapterNum: 3, title: "Chapter 3: Ecosystems", lessons: "Lessons 30-31", quizText: "", textbookPages: "Pages 72-73", activityPages: "Exp: Owl Pellet (77-80)", teacherPages: "IA 3.5", description: "Hands-on Owl Pellet Dissection lab.", materials: ["Dissection tweezers/probes", "Owl pellets", "Card stock"] },
-      { id: "C3_4", chapterNum: 3, title: "Chapter 3: Ecosystems", lessons: "Lessons 32-33", quizText: "Quiz 3C", textbookPages: "Pages 74-82", activityPages: "Study Guide (83-85)", teacherPages: "IA 3.6", description: "Adaptations, symbiosis, instincts. Includes Quiz 3C.", materials: ["Yarn (2 ft pieces)", "Dominion scenario cards"] },
-      { id: "C3_5", chapterNum: 3, title: "Chapter 3: Ecosystems", lessons: "Lessons 34-36", quizText: "", textbookPages: "Page 83", activityPages: "Exp: WebQuest (87-90)", teacherPages: "None", description: "Ecosystem Scavenger Hunt WebQuest.", materials: ["Printed WebQuest worksheets"] },
-      { id: "C3_6", chapterNum: 3, title: "Chapter 3: Ecosystems", lessons: "Lessons 37-38", quizText: "Test 3", textbookPages: "Review & Test", activityPages: "Study Guides Ch 3", teacherPages: "None", description: "Review of global ecosystem levels and Test 3.", materials: ["Chapter 3 Study Guides", "Printed Test 3 Sheets"] },
-
-      // CHAPTER 4
-      { id: "C4_1", chapterNum: 4, title: "Chapter 4: Changes in Ecosystems", lessons: "Lessons 39-40", quizText: "Quiz 4A", textbookPages: "Pages 84-96", activityPages: "Cycles of Matter (91), Study Guide (93-96)", teacherPages: "IA 4.1, IA 4.3", description: "Seasonal cycles, photosynthesis vs respiration. Includes Quiz 4A.", materials: ["Globe / world map", "Unshelled peanuts"] },
-      { id: "C4_2", chapterNum: 4, title: "Chapter 4: Changes in Ecosystems", lessons: "Lessons 41-42", quizText: "", textbookPages: "Page 97", activityPages: "Inv: Decomposers (97-100), Inq: Soils (101-104)", teacherPages: "IA 2.2", description: "Decomposers at Work soil investigations.", materials: ["Food scraps", "Decay observation jars", "Soil samples"] },
-      { id: "C4_3", chapterNum: 4, title: "Chapter 4: Changes in Ecosystems", lessons: "Lessons 43-44", quizText: "", textbookPages: "Pages 98-103", activityPages: "AiG: God Ordained Change (105-106)", teacherPages: "IA 4.5", description: "Natural stresses, flood/drought impacts.", materials: ["News articles on disasters", "Water cycle model components"] },
-      { id: "C4_4", chapterNum: 4, title: "Chapter 4: Changes in Ecosystems", lessons: "Lessons 45-47", quizText: "Quiz 4B", textbookPages: "Pages 104-111", activityPages: "Study Guide (107-110), Exp: Stress Alert! (111-121)", teacherPages: "IA 4.6, IA 4.9", description: "Invasive species, man-made stress, and Stress Alert game. Includes Quiz 4B.", materials: ["Light bulb", "Forest food web diagrams"] },
-      { id: "C4_5", chapterNum: 4, title: "Chapter 4: Changes in Ecosystems", lessons: "Lessons 48-49", quizText: "Test 4", textbookPages: "Review & Test", activityPages: "Graphic Organizer", teacherPages: "None", description: "Comprehensive Chapter 4 terms review and printed Test 4.", materials: ["16 index cards per group", "Printed Test 4 Sheets"] },
-
-      // CHAPTER 5
-      { id: "C5_1", chapterNum: 5, title: "Chapter 5: Biomes", lessons: "Lessons 50-51", quizText: "Quiz 5A", textbookPages: "Pages 112-125", activityPages: "Biomes (124), Tundra/Taiga (125), Study Guide (127-130)", teacherPages: "IA 5.1, IA 5.2", description: "Biosphere maps, Tundra/Taiga survival. Includes Quiz 5A.", materials: ["Globe", "Flashlight", "Permafrost model setups"] },
-      { id: "C5_2", chapterNum: 5, title: "Chapter 5: Biomes", lessons: "Lessons 52-53", quizText: "Quiz 5B", textbookPages: "Pages 126-136", activityPages: "Forests (131), Grassland/Desert (132), Study Guide (133-135)", teacherPages: "IA 5.3", description: "Rainforests, grasslands, and deserts. Includes Quiz 5B.", materials: ["Whole pineapple with leaves", "Sticky notes"] },
-      { id: "C5_3", chapterNum: 5, title: "Chapter 5: Biomes", lessons: "Lessons 54-55", quizText: "", textbookPages: "Pages 137-141", activityPages: "Inv: Water Loss (137-140)", teacherPages: "IA 5.4", description: "Water-loss protection with waxy leaves and Marine zones.", materials: ["Waxy leaves", "Non-waxy leaves", "Water-loss tracking sheets"] },
-      { id: "C5_4", chapterNum: 5, title: "Chapter 5: Biomes", lessons: "Lessons 56-57", quizText: "Quiz 5C", textbookPages: "Pages 142-150", activityPages: "Study Guide (147-150)", teacherPages: "None", description: "Freshwater systems and biome conservation. Includes Quiz 5C.", materials: ["Local threat research clippings", "Aquatic biome charts"] },
-      { id: "C5_5", chapterNum: 5, title: "Chapter 5: Biomes", lessons: "Lessons 58-59", quizText: "", textbookPages: "Page 151", activityPages: "Exp: Build a Biome (151-153)", teacherPages: "None", description: "'Build a Biome' physical modeling project.", materials: ["Cardboard shoeboxes", "Modeling clay", "Craft moss"] },
-      { id: "C5_6", chapterNum: 5, title: "Chapter 5: Biomes", lessons: "Lessons 60-61", quizText: "Test 5", textbookPages: "Review & Test", activityPages: "Study Guides Ch 5", teacherPages: "None", description: "Review worksheets and printed Test 5.", materials: ["Printed Test 5 Sheets"] },
-
-      // CHAPTER 6
-      { id: "C6_1", chapterNum: 6, title: "Chapter 6: Weather", lessons: "Lessons 62-63", quizText: "Quiz 6A", textbookPages: "Pages 152-162", activityPages: "Layers (155), Study Guide (157-160)", teacherPages: "IA 6.1, IA 6.2", description: "Atmosphere layers and wind tools. Includes Quiz 6A.", materials: ["Apple & paring knife", "Wind demonstration kit", "Anemometer"] },
-      { id: "C6_2", chapterNum: 6, title: "Chapter 6: Weather", lessons: "Lessons 64-65", quizText: "Quiz 6B", textbookPages: "Pages 163-168", activityPages: "Study Guide (163-164)", teacherPages: "None", description: "Cloud formation, precipitation profiles. Includes Quiz 6B.", materials: ["Clear cup with water", "Rain gauge"] },
-      { id: "C6_3", chapterNum: 6, title: "Chapter 6: Weather", lessons: "Lessons 66-67", quizText: "Quiz 6C", textbookPages: "Pages 169-174", activityPages: "Exp: Eye on Sky Pt 1 (165-167), Study Guide (169-170)", teacherPages: "IA 6.3 - IA 6.7", description: "Eye on the Sky weather station and air masses. Includes Quiz 6C.", materials: ["Wind vane & thermometer holder", "Pink and blue sponge models"] },
-      { id: "C6_4", chapterNum: 6, title: "Chapter 6: Weather", lessons: "Lessons 68-69", quizText: "", textbookPages: "Pages 175-179", activityPages: "Exp: Extremes (171-172)", teacherPages: "IA 6.8", description: "Severe storms modeling and safety plans.", materials: ["Tornado demonstration bottles", "Static electricity rods"] },
-      { id: "C6_5", chapterNum: 6, title: "Chapter 6: Weather", lessons: "Lessons 70-71", quizText: "Quiz 6D", textbookPages: "Pages 180-185", activityPages: "Study Guide (173-175), Exp: Eye on Sky Pt 2", teacherPages: "IA 6.1 Key", description: "Weather maps symbols and forecasting. Includes Quiz 6D.", materials: ["Printed weather maps", "Storm research sheets"] },
-      { id: "C6_6", chapterNum: 6, title: "Chapter 6: Weather", lessons: "Lessons 72-73", quizText: "Test 6", textbookPages: "Review & Test", activityPages: "Quizzes 6A-6D study sheets", teacherPages: "IA 6.9", description: "Weather vocabulary review and Chapter 6 Test.", materials: ["Printed Test 6 Sheets", "16 index cards per group"] },
-
-      // CHAPTER 7
-      { id: "C7_1", chapterNum: 7, title: "Chapter 7: Minerals & Rocks", lessons: "Lessons 74-75", quizText: "Quiz 7A", textbookPages: "Pages 186-195", activityPages: "Study Guide (181-183), Exp: Systems (185-189)", teacherPages: "None", description: "Earth's layers, geosphere, and interacting systems. Includes Quiz 7A.", materials: ["Apple and knife", "Banner paper", "Potted house plant"] },
-      { id: "C7_2", chapterNum: 7, title: "Chapter 7: Minerals & Rocks", lessons: "Lessons 76-78", quizText: "", textbookPages: "Pages 196-211", activityPages: "Prop of Minerals (191), Inv: Salty Crystals (193-195)", teacherPages: "None", description: "Mineral properties and saturated salt water crystals.", materials: ["Mineral crystal picture", "Salt crystal investigation supplies"] },
-      { id: "C7_3", chapterNum: 7, title: "Chapter 7: Minerals & Rocks", lessons: "Lessons 79-80", quizText: "Quiz 7B", textbookPages: "Pages 212", activityPages: "Study Guide (197-199), Exp: Munching Minerals (201-202)", teacherPages: "None", description: "Mineral uses, lapidary jobs, and nutrition labels. Includes Quiz 7B.", materials: ["Variety of items made from minerals", "Nutrition labels"] },
-      { id: "C7_4", chapterNum: 7, title: "Chapter 7: Minerals & Rocks", lessons: "Lessons 81-82", quizText: "Quiz 7C", textbookPages: "Pages 213-219", activityPages: "Study Guide (203-204), Exp: Rock Hounding (205-208)", teacherPages: "None", description: "Igneous, sedimentary, metamorphic rocks and Rock Hounding. Includes Quiz 7C.", materials: ["Crispy rice treats", "Sandstone sample", "Magnifying glass", "Rock collection supplies"] },
-      { id: "C7_5", chapterNum: 7, title: "Chapter 7: Minerals & Rocks", lessons: "Lessons 83-84", quizText: "", textbookPages: "Pages 219-220", activityPages: "Inv: Salty Crystals Pt 2 (209-210), Ch 7 Study Guides", teacherPages: "None", description: "Salty Crystals Pt 2 and Chapter 7 Review.", materials: ["Plastic jewels or foil-wrapped candy"] },
-      { id: "C7_6", chapterNum: 7, title: "Chapter 7: Minerals & Rocks", lessons: "Lesson 85", quizText: "Test 7", textbookPages: "Test 7", activityPages: "None", teacherPages: "None", description: "Printed Chapter 7 Test.", materials: ["Printed Test 7 Sheets"] },
-
-      // CHAPTER 8
-      { id: "C8_1", chapterNum: 8, title: "Chapter 8: Fossils and Dinosaurs", lessons: "Lessons 86-87", quizText: "Quiz 8A", textbookPages: "Pages 220-231", activityPages: "Fossils (211-212), Study Guide (213-215)", teacherPages: "None", description: "Fossil formation and types of fossils preserved in sediment. Includes Quiz 8A.", materials: ["Fossil samples or pictures"] },
-      { id: "C8_2", chapterNum: 8, title: "Chapter 8: Fossils and Dinosaurs", lessons: "Lessons 88-90", quizText: "Quiz 8B", textbookPages: "Pages 232-237", activityPages: "Exp: Molds & Casts (217-219), Study Guide (221-222)", teacherPages: "None", description: "Molds, casts, fossil fuels, and paleontologist careers. Includes Quiz 8B.", materials: ["Molds/casts supplies", "14 sticky notes"] },
-      { id: "C8_3", chapterNum: 8, title: "Chapter 8: Fossils and Dinosaurs", lessons: "Lessons 91-92", quizText: "", textbookPages: "Pages 238-243", activityPages: "Exp: Fossil Dig (223-226), Dinosaurs (227)", teacherPages: "IA 8.1", description: "Fossil Dig excavation and what dinosaur fossils teach.", materials: ["Excavation supplies", "Banner paper and markers"] },
-      { id: "C8_4", chapterNum: 8, title: "Chapter 8: Fossils and Dinosaurs", lessons: "Lessons 93-94", quizText: "Quiz 8C", textbookPages: "Pages 244-248", activityPages: "AiG: Soft Bones (229-230), Study Guide (231-233)", teacherPages: "None", description: "Biblical teachings on dinosaurs and soft-tissue evidence. Includes Quiz 8C.", materials: ["White construction paper"] },
-      { id: "C8_5", chapterNum: 8, title: "Chapter 8: Fossils and Dinosaurs", lessons: "Lessons 95-97", quizText: "", textbookPages: "Pages 249-250", activityPages: "Exp: Which Viewpoint? (235-237), Ch 8 Study Guides", teacherPages: "None", description: "Worldviews on fossils and comprehensive Chapter 8 Review.", materials: ["Viewpoint exploration supplies", "Dinosaur skeleton picture"] },
-      { id: "C8_6", chapterNum: 8, title: "Chapter 8: Fossils and Dinosaurs", lessons: "Lesson 98", quizText: "Test 8", textbookPages: "Test 8", activityPages: "None", teacherPages: "None", description: "Printed Chapter 8 Test.", materials: ["Printed Test 8 Sheets"] }
+    const flatLessons = [
+      { id: "C1_L1_2", ch: 1, type: "core", name: "About Matter", text: "Lessons 1-2" },
+      { id: "C1_L3", ch: 1, type: "exploration", name: "Measuring Matter", text: "Lesson 3" },
+      { id: "C1_L4_5", ch: 1, type: "core", name: "Physical Properties", text: "Lessons 4-5", quiz: "Quiz 1A" },
+      { id: "C1_L6_7", ch: 1, type: "exploration", name: "Ph'antastic Properties", text: "Lessons 6-7" },
+      { id: "C1_L8_9", ch: 1, type: "stem", name: "Float a Boat", text: "Lessons 8-9" },
+      { id: "C1_L10", ch: 1, type: "review", name: "Chapter 1 Review", text: "Lesson 10", quiz: "Quiz 1B" },
+      { id: "C1_T1", ch: 1, type: "test", name: "Test 1", text: "Test 1", test: "Test 1" },
+      { id: "C2_L12_13", ch: 2, type: "core", name: "Changes in Matter", text: "Lessons 12-13" },
+      { id: "C2_L14_15", ch: 2, type: "core", name: "Heterogeneous Mixtures", text: "Lessons 14-15", quiz: "Quiz 2A" },
+      { id: "C2_L16_17", ch: 2, type: "core", name: "Separating Mixtures", text: "Lessons 16-17" },
+      { id: "C2_L18", ch: 2, type: "core", name: "Homogeneous Mixtures", text: "Lesson 18", quiz: "Quiz 2B" },
+      { id: "C2_L19", ch: 2, type: "exploration", name: "Where's the Fizz?", text: "Lesson 19" },
+      { id: "C2_L20_21", ch: 2, type: "core", name: "Chemical Changes", text: "Lessons 20-21", quiz: "Quiz 2C" },
+      { id: "C2_L22", ch: 2, type: "core", name: "Inv: A+B", text: "Lesson 22" },
+      { id: "C2_L23", ch: 2, type: "review", name: "Chapter 2 Review", text: "Lesson 23", quiz: "Quiz 2D" },
+      { id: "C2_T2", ch: 2, type: "test", name: "Test 2", text: "Test 2", test: "Test 2" },
+      { id: "C3_L25_26", ch: 3, type: "core", name: "Ecosystems", text: "Lessons 25-26" },
+      { id: "C3_L27", ch: 3, type: "stem", name: "Model an Ecosystem", text: "Lesson 27", quiz: "Quiz 3A" },
+      { id: "C3_L28", ch: 3, type: "core", name: "Energy & Matter", text: "Lesson 28" },
+      { id: "C3_L29", ch: 3, type: "exploration", name: "Competitions", text: "Lesson 29", quiz: "Quiz 3B" },
+      { id: "C3_L30", ch: 3, type: "exploration", name: "Owl Pellet", text: "Lesson 30" },
+      { id: "C3_L31", ch: 3, type: "stem", name: "Ecologist Career", text: "Lesson 31" },
+      { id: "C3_L32_33", ch: 3, type: "core", name: "Adaptations", text: "Lessons 32-33" },
+      { id: "C3_L34_36", ch: 3, type: "exploration", name: "WebQuest", text: "Lessons 34-36", quiz: "Quiz 3C" },
+      { id: "C3_L37", ch: 3, type: "review", name: "Chapter 3 Review", text: "Lesson 37" },
+      { id: "C3_T3", ch: 3, type: "test", name: "Test 3", text: "Test 3", test: "Test 3" },
+      { id: "C4_L39_40", ch: 4, type: "core", name: "Cycles", text: "Lessons 39-40" },
+      { id: "C4_L41", ch: 4, type: "core", name: "Decomposers", text: "Lesson 41", quiz: "Quiz 4A" },
+      { id: "C4_L42", ch: 4, type: "core", name: "Different Soils", text: "Lesson 42" },
+      { id: "C4_L43", ch: 4, type: "core", name: "Stresses", text: "Lesson 43" },
+      { id: "C4_L44", ch: 4, type: "stem", name: "Aquatic Ecologist", text: "Lesson 44" },
+      { id: "C4_L45", ch: 4, type: "core", name: "Humans & Ecosystems", text: "Lesson 45", quiz: "Quiz 4B" },
+      { id: "C4_L46_47", ch: 4, type: "exploration", name: "Stress Alert!", text: "Lessons 46-47" },
+      { id: "C4_L48", ch: 4, type: "review", name: "Chapter 4 Review", text: "Lesson 48" },
+      { id: "C4_T4", ch: 4, type: "test", name: "Test 4", text: "Test 4", test: "Test 4" },
+      { id: "C5_L50_51", ch: 5, type: "core", name: "Biomes", text: "Lessons 50-51" },
+      { id: "C5_L52_53", ch: 5, type: "core", name: "Forests & Deserts", text: "Lessons 52-53", quiz: "Quiz 5A" },
+      { id: "C5_L54", ch: 5, type: "core", name: "Water Loss Inv", text: "Lesson 54", quiz: "Quiz 5B" },
+      { id: "C5_L55_57", ch: 5, type: "core", name: "Aquatic Biomes", text: "Lessons 55-57" },
+      { id: "C5_L58_59", ch: 5, type: "exploration", name: "Build a Biome", text: "Lessons 58-59", quiz: "Quiz 5C" },
+      { id: "C5_L60", ch: 5, type: "review", name: "Chapter 5 Review", text: "Lesson 60" },
+      { id: "C5_T5", ch: 5, type: "test", name: "Test 5", text: "Test 5", test: "Test 5" },
+      { id: "C6_L62_63", ch: 6, type: "core", name: "Weather", text: "Lessons 62-63" },
+      { id: "C6_L64_65", ch: 6, type: "core", name: "Moisture & Precip", text: "Lessons 64-65", quiz: "Quiz 6A" },
+      { id: "C6_L66", ch: 6, type: "exploration", name: "Eye on the Sky 1", text: "Lesson 66", quiz: "Quiz 6B" },
+      { id: "C6_L67_68", ch: 6, type: "core", name: "Air & Severe Weather", text: "Lessons 67-68" },
+      { id: "C6_L69", ch: 6, type: "exploration", name: "Dangerous Extremes", text: "Lesson 69", quiz: "Quiz 6C" },
+      { id: "C6_L70", ch: 6, type: "core", name: "Forecasting", text: "Lesson 70" },
+      { id: "C6_L71", ch: 6, type: "exploration", name: "Eye on the Sky 2", text: "Lesson 71", quiz: "Quiz 6D" },
+      { id: "C6_L72", ch: 6, type: "review", name: "Chapter 6 Review", text: "Lesson 72" },
+      { id: "C6_T6", ch: 6, type: "test", name: "Test 6", text: "Test 6", test: "Test 6" },
+      { id: "C7_L74", ch: 7, type: "core", name: "Minerals & Rocks", text: "Lesson 74" },
+      { id: "C7_L75", ch: 7, type: "exploration", name: "Interacting Systems", text: "Lesson 75" },
+      { id: "C7_L76_77", ch: 7, type: "core", name: "Properties & Crystals", text: "Lessons 76-77", quiz: "Quiz 7A" },
+      { id: "C7_L78", ch: 7, type: "core", name: "Uses of Minerals", text: "Lesson 78" },
+      { id: "C7_L79", ch: 7, type: "exploration", name: "Munching Minerals", text: "Lesson 79", quiz: "Quiz 7B" },
+      { id: "C7_L80", ch: 7, type: "core", name: "Rocks", text: "Lesson 80" },
+      { id: "C7_L81", ch: 7, type: "exploration", name: "Rock Hounding", text: "Lesson 81", quiz: "Quiz 7C" },
+      { id: "C7_L82_83", ch: 7, type: "review", name: "Salty Crystals 2 & Review", text: "Lessons 82-83" },
+      { id: "C7_T7", ch: 7, type: "test", name: "Test 7", text: "Test 7", test: "Test 7" },
+      { id: "C8_L85_86", ch: 8, type: "core", name: "Fossils", text: "Lessons 85-86" },
+      { id: "C8_L87_88", ch: 8, type: "exploration", name: "Molds and Casts", text: "Lessons 87-88", quiz: "Quiz 8A" },
+      { id: "C8_L89", ch: 8, type: "core", name: "Learning from Fossils", text: "Lesson 89" },
+      { id: "C8_L90", ch: 8, type: "exploration", name: "Fossil Dig", text: "Lesson 90", quiz: "Quiz 8B" },
+      { id: "C8_L91_93", ch: 8, type: "core", name: "Dinosaur Fossils", text: "Lessons 91-93" },
+      { id: "C8_L94_95", ch: 8, type: "exploration", name: "Which Viewpoint?", text: "Lessons 94-95", quiz: "Quiz 8C" },
+      { id: "C8_L96", ch: 8, type: "review", name: "Chapter 8 Review", text: "Lesson 96" },
+      { id: "C8_T8", ch: 8, type: "test", name: "Test 8", text: "Test 8", test: "Test 8" },
+      { id: "C9_L98", ch: 9, type: "core", name: "The Sun", text: "Lesson 98" },
+      { id: "C9_L99_100", ch: 9, type: "stem", name: "Heat It Up!", text: "Lessons 99-100" },
+      { id: "C9_L101_102", ch: 9, type: "core", name: "Planets", text: "Lessons 101-102" },
+      { id: "C9_L103", ch: 9, type: "core", name: "Outer Planets", text: "Lesson 103", quiz: "Quiz 9A" },
+      { id: "C9_L104_106", ch: 9, type: "exploration", name: "WebQuest to Space", text: "Lessons 104-106", quiz: "Quiz 9B" },
+      { id: "C9_L107_108", ch: 9, type: "core", name: "Space Exploration", text: "Lessons 107-108" },
+      { id: "C9_L109", ch: 9, type: "review", name: "Chapter 9 Review", text: "Lesson 109", quiz: "Quiz 9C" },
+      { id: "C9_T9", ch: 9, type: "test", name: "Test 9", text: "Test 9", test: "Test 9" },
+      { id: "C10_L111", ch: 10, type: "core", name: "Moon's Origin", text: "Lesson 111" },
+      { id: "C10_L112", ch: 10, type: "exploration", name: "Moonwatchers", text: "Lesson 112" },
+      { id: "C10_L113_114", ch: 10, type: "stem", name: "Moon Landing", text: "Lessons 113-114", quiz: "Quiz 10A" },
+      { id: "C10_L115_116", ch: 10, type: "core", name: "Moon's Properties", text: "Lessons 115-116" },
+      { id: "C10_L117_118", ch: 10, type: "exploration", name: "Moon Model", text: "Lessons 117-118", quiz: "Quiz 10B" },
+      { id: "C10_L119_120", ch: 10, type: "core", name: "Motions and Phases", text: "Lessons 119-120" },
+      { id: "C10_L121", ch: 10, type: "review", name: "Chapter 10 Review", text: "Lesson 121", quiz: "Quiz 10C" },
+      { id: "C10_T10", ch: 10, type: "test", name: "Test 10", text: "Test 10", test: "Test 10" },
+      { id: "C11_L123_124", ch: 11, type: "core", name: "Stars & Brightness", text: "Lessons 123-124" },
+      { id: "C11_L125_126", ch: 11, type: "core", name: "Kinds of Stars", text: "Lessons 125-126", quiz: "Quiz 11A" },
+      { id: "C11_L127", ch: 11, type: "exploration", name: "Pinhole Constellations", text: "Lesson 127" },
+      { id: "C11_L128", ch: 11, type: "core", name: "Star Groups", text: "Lesson 128", quiz: "Quiz 11B" },
+      { id: "C11_L129", ch: 11, type: "exploration", name: "Stargazing", text: "Lesson 129" },
+      { id: "C11_L130", ch: 11, type: "core", name: "Other Space Objects", text: "Lesson 130" },
+      { id: "C11_L131_133", ch: 11, type: "stem", name: "Asteroid Mining", text: "Lessons 131-133", quiz: "Quiz 11C" },
+      { id: "C11_L134", ch: 11, type: "review", name: "Chapter 11 Review", text: "Lesson 134" },
+      { id: "C11_T11", ch: 11, type: "test", name: "Test 11", text: "Test 11", test: "Test 11" },
+      { id: "C12_L136_138", ch: 12, type: "core", name: "Infectious Diseases", text: "Lessons 136-138" },
+      { id: "C12_L139_140", ch: 12, type: "exploration", name: "Epidemic Proportions", text: "Lessons 139-140", quiz: "Quiz 12A" },
+      { id: "C12_L141_142", ch: 12, type: "core", name: "Immune System Defenses", text: "Lessons 141-142" },
+      { id: "C12_L143_145", ch: 12, type: "exploration", name: "Breaking News! WebQuest", text: "Lessons 143-145", quiz: "Quiz 12B" },
+      { id: "C12_L146", ch: 12, type: "review", name: "Chapter 12 Review", text: "Lesson 146" },
+      { id: "C12_T12", ch: 12, type: "test", name: "Test 12", text: "Test 12", test: "Test 12" },
+      { id: "C13_L148_149", ch: 13, type: "core", name: "Breathing & Diaphragm", text: "Lessons 148-149" },
+      { id: "C13_L150", ch: 13, type: "exploration", name: "Breathe In, Breathe Out", text: "Lesson 150", quiz: "Quiz 13A" },
+      { id: "C13_L151_153", ch: 13, type: "core", name: "Nose, Pharynx, Trachea", text: "Lessons 151-153" },
+      { id: "C13_L154", ch: 13, type: "core", name: "Air in Lungs", text: "Lesson 154" },
+      { id: "C13_L155_156", ch: 13, type: "core", name: "Respiratory Diseases", text: "Lessons 155-156", quiz: "Quiz 13B" },
+      { id: "C13_L157", ch: 13, type: "review", name: "Chapter 13 Review", text: "Lesson 157", quiz: "Quiz 13C" },
+      { id: "C13_T13", ch: 13, type: "test", name: "Test 13", text: "Test 13", test: "Test 13" },
+      { id: "C14_L159", ch: 14, type: "core", name: "The Heart", text: "Lesson 159" },
+      { id: "C14_L160", ch: 14, type: "core", name: "How Fast is the Beat", text: "Lesson 160" },
+      { id: "C14_L161", ch: 14, type: "core", name: "Blood Vessels", text: "Lesson 161" },
+      { id: "C14_L162", ch: 14, type: "exploration", name: "Heart of the Matter", text: "Lesson 162" },
+      { id: "C14_L163_164", ch: 14, type: "core", name: "The Blood", text: "Lessons 163-164", quiz: "Quiz 14A" },
+      { id: "C14_L165_166", ch: 14, type: "core", name: "Cleaning the Blood", text: "Lessons 165-166", quiz: "Quiz 14B" },
+      { id: "C14_L167", ch: 14, type: "core", name: "Pump and Pour", text: "Lesson 167" },
+      { id: "C14_L168", ch: 14, type: "review", name: "Chapter 14 Review", text: "Lesson 168", quiz: "Quiz 14C" },
+      { id: "C14_T14", ch: 14, type: "test", name: "Test 14", text: "Test 14", test: "Test 14" },
+      { id: "C15_L170_171", ch: 15, type: "core", name: "Nervous System Structure", text: "Lessons 170-171" },
+      { id: "C15_L172", ch: 15, type: "core", name: "Reaction Time", text: "Lesson 172" },
+      { id: "C15_L173", ch: 15, type: "core", name: "Interactions", text: "Lesson 173", quiz: "Quiz 15A" },
+      { id: "C15_L174_175", ch: 15, type: "core", name: "Touch Points", text: "Lessons 174-175" },
+      { id: "C15_L176", ch: 15, type: "core", name: "Memory and Sleep", text: "Lesson 176", quiz: "Quiz 15B" },
+      { id: "C15_L177_178", ch: 15, type: "core", name: "Disorders & Medications", text: "Lessons 177-178" },
+      { id: "C15_L179", ch: 15, type: "review", name: "Chapter 15 Review", text: "Lesson 179", quiz: "Quiz 15C" },
+      { id: "C15_T15", ch: 15, type: "test", name: "Test 15", text: "Test 15", test: "Test 15" }
     ];
 
-    // Automatically generate the remaining placeholders up to Lesson 180 
-    // adhering to the strict pacing rules (2 lessons + Quiz, 1 + Test).
-    function generatePlaceholderBlocks() {
-      let currentLesson = 99;
-      let chapter = 9;
-      
-      while (currentLesson <= 180) {
-        // Build generic blocks for a chapter (approx 10-12 lessons per chapter)
-        curriculumBlocks.push({ id: `C${chapter}_1`, chapterNum: 'generic', title: `Chapter ${chapter}: Future Curriculum`, lessons: `Lessons ${currentLesson}-${currentLesson+1}`, quizText: `Quiz ${chapter}A`, textbookPages: "TBD", activityPages: "TBD", teacherPages: "None", description: "Auto-generated placeholder respecting 2-lessons-per-quiz rule.", materials: ["Standard Classroom Supplies"] });
-        currentLesson += 2;
-        
-        if (currentLesson > 180) break;
-        curriculumBlocks.push({ id: `C${chapter}_2`, chapterNum: 'generic', title: `Chapter ${chapter}: Future Curriculum`, lessons: `Lessons ${currentLesson}-${currentLesson+2}`, quizText: "", textbookPages: "TBD", activityPages: "TBD", teacherPages: "None", description: "Auto-generated placeholder respecting 3-lesson standard block rule.", materials: ["Standard Classroom Supplies"] });
-        currentLesson += 3;
-        
-        if (currentLesson > 180) break;
-        curriculumBlocks.push({ id: `C${chapter}_3`, chapterNum: 'generic', title: `Chapter ${chapter}: Future Curriculum`, lessons: `Lessons ${currentLesson}-${currentLesson+1}`, quizText: `Quiz ${chapter}B`, textbookPages: "TBD", activityPages: "TBD", teacherPages: "None", description: "Auto-generated placeholder respecting 2-lessons-per-quiz rule.", materials: ["Standard Classroom Supplies"] });
-        currentLesson += 2;
-        
-        if (currentLesson > 180) break;
-        curriculumBlocks.push({ id: `C${chapter}_4`, chapterNum: 'generic', title: `Chapter ${chapter}: Future Curriculum`, lessons: `Lessons ${currentLesson}-${currentLesson+2}`, quizText: "", textbookPages: "TBD", activityPages: "TBD", teacherPages: "None", description: "Auto-generated placeholder respecting 3-lesson standard block rule.", materials: ["Standard Classroom Supplies"] });
-        currentLesson += 3;
+    let curriculumBlocks = [];
 
-        if (currentLesson > 180) break;
-        curriculumBlocks.push({ id: `C${chapter}_5`, chapterNum: 'generic', title: `Chapter ${chapter}: Future Curriculum`, lessons: `Lesson ${currentLesson}`, quizText: `Test ${chapter}`, textbookPages: "Review & Test", activityPages: "TBD", teacherPages: "None", description: "Auto-generated placeholder respecting 1-lesson-plus-test rule.", materials: [`Printed Test ${chapter} Sheets`] });
-        currentLesson += 1;
+    function buildCurriculumBlocks() {
+      let filtered = flatLessons.filter(l => {
+        if (l.type === 'exploration' && !state.includeExp) return false;
+        if (l.type === 'stem' && !state.includeStem) return false;
+        return true;
+      });
 
-        chapter++;
+      curriculumBlocks = [];
+      let currentBlock = null;
+      let lessonCount = 0;
+      let pendingQuizzes = [];
+
+      for (let i = 0; i < filtered.length; i++) {
+        let l = filtered[i];
+        if (l.quiz) pendingQuizzes.push(l.quiz);
+
+        let lCount = l.text.includes('-') ? 2 : 1; 
+
+        if (!currentBlock) {
+          currentBlock = {
+            id: l.id,
+            chapterNum: l.ch,
+            title: l.type === 'test' ? l.name : `Ch ${l.ch}: ${l.name}`,
+            lessons: l.text,
+            hwLessons: l.text,
+            testText: l.test || "",
+            quizText: "",
+            type: l.type,
+            description: l.type === 'test' ? `Administer ${l.name}. Time permitting, move to next chapter.` : "Active lecture block.",
+            materials: []
+          };
+          lessonCount = lCount;
+        } else {
+          let isTestNext = l.type === 'test';
+          
+          if (!isTestNext && lessonCount + lCount <= 3 && currentBlock.type !== 'review') {
+            currentBlock.title += ` & ${l.name}`;
+            currentBlock.lessons += `, ${l.text}`;
+            currentBlock.hwLessons += `, ${l.text}`;
+            lessonCount += lCount;
+            if (l.test) currentBlock.testText = l.test;
+          } else {
+            if (pendingQuizzes.length > 0) {
+              currentBlock.quizText = pendingQuizzes.join(", ");
+              pendingQuizzes = [];
+            }
+            curriculumBlocks.push(currentBlock);
+            currentBlock = {
+              id: l.id,
+              chapterNum: l.ch,
+              title: l.type === 'test' ? l.name : `Ch ${l.ch}: ${l.name}`,
+              lessons: l.text,
+              hwLessons: l.text,
+              testText: l.test || "",
+              quizText: "",
+              type: l.type,
+              description: l.type === 'test' ? `Administer ${l.name}. Time permitting, move to next chapter.` : "Active lecture block.",
+              materials: []
+            };
+            lessonCount = lCount;
+          }
+        }
+      }
+      if (currentBlock) {
+        if (pendingQuizzes.length > 0) currentBlock.quizText = pendingQuizzes.join(", ");
+        curriculumBlocks.push(currentBlock);
       }
     }
-    generatePlaceholderBlocks();
 
-    // DYNAMIC CALENDAR GENERATOR (August 10, 2026 -> June 4, 2027)
-    // Avoids massive hardcoded arrays while capturing all explicit dates/closures from DOC042726-1.pdf
     function generateFullYearDates() {
       const dates = [];
       const startDate = new Date('2026-08-10T12:00:00'); 
@@ -332,9 +447,7 @@
         '2027-06-04': { note: 'TEACHER WORKDAY', closed: true }
       };
 
-      // Bulk inject Christmas Break (Dec 21 - Dec 31)
       for(let d=21; d<=31; d++) specificHolidays[`2026-12-${d}`] = { note: 'CHRISTMAS BREAK', closed: true };
-      // Bulk inject Spring Break (Mar 22 - Mar 26)
       for(let d=22; d<=26; d++) specificHolidays[`2027-03-${d}`] = { note: 'SPRING BREAK', closed: true };
 
       const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -343,8 +456,7 @@
       let current = new Date(startDate);
       while(current <= endDate) {
         const dWeek = current.getDay();
-        if (dWeek !== 0 && dWeek !== 6) { // Skip weekends
-          const isoDate = current.toISOString().split('T')[0];
+        if (dWeek !== 0 && dWeek !== 6) { 
           const mmStr = String(current.getMonth() + 1).padStart(2, '0');
           const ddStr = String(current.getDate()).padStart(2, '0');
           const keyDate = `${current.getFullYear()}-${mmStr}-${ddStr}`;
@@ -366,14 +478,24 @@
     function getCurriculumCompleteBlock() {
       return {
         id: "COMPLETE",
-        chapterNum: 'generic', title: "Curriculum Enrichment", lessons: "Finished Textbooks", quizText: "",
+        chapterNum: 'generic', title: "Curriculum Enrichment", lessons: "Finished Textbooks", quizText: "", hwLessons: "None",
         textbookPages: "None", activityPages: "None", teacherPages: "None",
         description: "You have taught all required Chapters! Use this day for enrichment labs.",
-        materials: ["Review notebooks", "Alternative assessment models"]
+        materials: []
       };
     }
 
-    window.onload = function() { calculateSchedule(); }
+    window.onload = function() { 
+      buildCurriculumBlocks();
+      calculateSchedule(); 
+    }
+
+    function toggleLessonTypes() {
+      state.includeExp = document.getElementById('toggleExp').checked;
+      state.includeStem = document.getElementById('toggleStem').checked;
+      buildCurriculumBlocks();
+      calculateSchedule();
+    }
 
     function showNotification(text) {
       const banner = document.getElementById('notificationBanner');
@@ -423,6 +545,8 @@
       let currentCycleDay = 'A';
       let activeClassBlocksCount = 0;
       let calculatedCalendar = [];
+      let pendingTest = null;
+      let midtermAssigned = false;
 
       for (let day of schoolCalendarDates) {
         let entry = { ...day };
@@ -438,24 +562,60 @@
 
           if (entry.cycleDay === state.scienceDay) {
             entry.isScienceDay = true;
+            let isTargetDay = entry.label.includes('Wed') || entry.label.includes('Fri');
             const adjustment = state.adjustments[entry.date];
 
             if (adjustment === 'bump') {
               entry.assignedBlock = {
-                id: `FLEX_${entry.date}`,
-                chapterNum: 'review', title: "Teacher Discretion / Flex Day", lessons: "Flex Day", quizText: "",
+                id: `FLEX_${entry.date}`, chapterNum: 'review', title: "Teacher Discretion / Flex Day", lessons: "Flex Day", quizText: "", hwLessons: "None",
                 textbookPages: "None", activityPages: "None", teacherPages: "None",
-                description: "Manually pushed by teacher. Use this 85-minute block to catch up.", materials: ["Study guides"]
+                description: "Manually pushed by teacher. Use this 85-minute block to catch up.", materials: []
               };
               entry.isBumped = true;
             } else if (adjustment === 'pull') {
               entry.isPulled = true;
               activeClassBlocksCount++; 
-              entry.assignedBlock = activeClassBlocksCount < curriculumBlocks.length ? curriculumBlocks[activeClassBlocksCount] : getCurriculumCompleteBlock();
-              activeClassBlocksCount++;
-            } else {
-              entry.assignedBlock = activeClassBlocksCount < curriculumBlocks.length ? curriculumBlocks[activeClassBlocksCount] : getCurriculumCompleteBlock();
-              activeClassBlocksCount++;
+            }
+
+            if (!adjustment && entry.date >= '2026-12-15' && !midtermAssigned) {
+                midtermAssigned = true;
+                entry.assignedBlock = {
+                    id: "MIDTERM_EXAM", chapterNum: 'review', title: "MIDTERM EXAM", lessons: "Midterm Assessment", quizText: "Midterm", hwLessons: "None",
+                    textbookPages: "Review", activityPages: "None", teacherPages: "None",
+                    description: "Comprehensive Midterm. Administered on/immediately after Dec 15th.", materials: ["Printed Midterm Sheets"]
+                };
+                currentCycleDay = currentCycleDay === 'A' ? 'B' : 'A';
+                calculatedCalendar.push(entry);
+                continue; 
+            }
+
+            if (adjustment !== 'bump') {
+                let b = null;
+                if (activeClassBlocksCount < curriculumBlocks.length) {
+                    b = JSON.parse(JSON.stringify(curriculumBlocks[activeClassBlocksCount])); 
+                } else {
+                    b = getCurriculumCompleteBlock();
+                }
+
+                if (b && b.testText) {
+                    if (isTargetDay) {
+                        b.quizText = (b.quizText ? b.quizText + ", " : "") + b.testText;
+                        b.testText = ""; 
+                    } else {
+                        pendingTest = b.testText;
+                        b.testText = ""; 
+                    }
+                }
+                
+                if (pendingTest && isTargetDay) {
+                    if (b) {
+                        b.quizText = (b.quizText ? b.quizText + ", " : "") + pendingTest;
+                        pendingTest = null;
+                    }
+                }
+
+                entry.assignedBlock = b;
+                activeClassBlocksCount++;
             }
           } else { entry.isScienceDay = false; }
           currentCycleDay = currentCycleDay === 'A' ? 'B' : 'A';
@@ -471,6 +631,7 @@
       document.getElementById('lostDaysCount').innerText = `${state.lostDays.length} / 40 days`;
       document.getElementById('lostDaysBar').style.width = `${(state.lostDays.length / 40) * 100}%`;
       document.getElementById('statScienceBlocks').innerText = activeClassBlocksCount;
+      document.getElementById('statActiveLessons').innerText = flatLessons.length;
       updateButtonStates();
       renderCalendar(calculatedCalendar);
       renderSidebarChecklist(calculatedCalendar);
@@ -502,7 +663,6 @@
       if (tempWeek.length > 0) weeks.push(tempWeek);
 
       weeks.forEach((week, weekIndex) => {
-        // Handle Quarter Filtering dynamically
         if (filterVal !== 'all') {
           const hasMatch = week.some(day => {
             const m = parseInt(day.date.split('-')[1]);
@@ -578,20 +738,18 @@
             if (day.isBumped) indicatorLabel += ` (Pushed)`;
             if (day.isPulled) indicatorLabel += ` (Pulled)`;
 
-            // HW Logic
             let hwText = "";
             let isNoHwDay = day.label.includes('Wed') || day.label.includes('Fri');
             if (state.customHomework[b.id] !== undefined) {
                 hwText = state.customHomework[b.id];
-            } else if (b.lessons.includes('Test') || b.lessons.includes('Flex') || b.lessons.includes('Finished')) {
-                hwText = `<span class="text-slate-600 font-medium">None (Testing / Flex Block)</span>`;
+            } else if (b.hwLessons === "None" || (b.quizText && b.quizText.includes('Test')) || b.lessons.includes('Test')) {
+                hwText = `<span class="text-slate-600 font-medium">None (Testing / Review / Flex)</span>`;
             } else if (isNoHwDay) {
                 hwText = `<span class="text-emerald-600 font-bold">None</span> <span class="text-slate-500 font-medium">(No HW on Wed/Fri)</span>`;
             } else {
-                hwText = `<span class="text-slate-700 font-medium">Gather vocabulary and answer the 3 end-of-reading questions for ${b.lessons} in your Science Notebook.</span>`;
+                hwText = `<span class="text-slate-700 font-medium">Gather vocabulary and answer the 3 end-of-reading questions for ${b.hwLessons} in your Science Notebook.</span>`;
             }
 
-            // Minimized Core
             minHTML = `
               <div class="flex justify-between items-start w-full">
                 <div class="flex flex-col">
@@ -606,20 +764,11 @@
               </div>
             `;
             
-            // Expanded Core
             expandHTML = `
               <div id="details-${day.date}" class="${isExpanded} expanded-print mt-3 pt-3 border-t border-${theme.amberBorder} w-full text-left" onclick="event.stopPropagation()">
                 <h5 class="font-extrabold text-sm ${theme.titleColor}">${b.title}</h5>
                 <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">${b.description}</p>
                 
-                <!-- Physical Resource Links Panel -->
-                <div class="mt-2 text-[9px] bg-white border border-${theme.amberBorder} rounded p-1.5 space-y-1">
-                  <div class="flex items-start gap-1"><span class="font-bold text-slate-500 w-10 flex-shrink-0">Book:</span><span class="text-slate-700">${b.textbookPages}</span></div>
-                  <div class="flex items-start gap-1"><span class="font-bold text-slate-500 w-10 flex-shrink-0">Activity:</span><span class="text-slate-700">${b.activityPages}</span></div>
-                  <div class="flex items-start gap-1"><span class="font-bold text-slate-500 w-10 flex-shrink-0">Teacher:</span><span class="text-slate-700">${b.teacherPages}</span></div>
-                </div>
-
-                <!-- Dynamic Homework Assignment -->
                 <div class="mt-2 p-1.5 bg-white/60 rounded border border-${theme.amberBorder} text-[9px] leading-tight shadow-sm">
                   <strong class="text-slate-800 select-none pointer-events-none">Homework:</strong> 
                   <span contenteditable="true" 
@@ -628,7 +777,6 @@
                        title="Click to edit homework">${hwText}</span>
                 </div>
                 
-                <!-- Push / Pull Adjustments -->
                 <div class="mt-3 pt-2 border-t border-${theme.amberBorder} flex items-center justify-between gap-1 no-print">
                   ${day.isBumped || day.isPulled ? `
                     <button onclick="resetDay('${day.date}', event)" class="w-full text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1 px-2 rounded transition flex items-center justify-center gap-1">Reset Shift</button>
@@ -674,26 +822,8 @@
 
     function renderSidebarChecklist(calculatedCalendar) {
       const listDiv = document.getElementById('sidebarChecklist');
-      listDiv.innerHTML = '';
-      let materialSet = new Set();
-      calculatedCalendar.forEach(day => {
-        if (day.isScienceDay && day.assignedBlock && day.assignedBlock.materials) {
-          day.assignedBlock.materials.forEach(m => materialSet.add(m));
-        }
-      });
-      if (materialSet.size === 0) {
-        listDiv.innerHTML = `<p class="text-xs text-slate-400 italic">No hands-on active lessons planned for current selection window.</p>`;
-        return;
-      }
-      materialSet.forEach(material => {
-        const item = document.createElement('label');
-        item.className = "flex items-center gap-2.5 p-2 bg-slate-50 border border-slate-100 rounded-lg cursor-pointer hover:bg-slate-100 transition text-xs text-slate-600 font-medium";
-        item.innerHTML = `
-          <input type="checkbox" class="rounded text-emerald-600 focus:ring-emerald-500 h-4.5 w-4.5">
-          <span>${material}</span>
-        `;
-        listDiv.appendChild(item);
-      });
+      if (!listDiv) return;
+      listDiv.innerHTML = `<p class="text-xs text-slate-400 italic">No active hands-on materials planned for the current view.</p>`;
     }
   </script>
 </body>
