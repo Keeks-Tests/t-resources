@@ -194,16 +194,16 @@
                     <!-- Controls Dashboard -->
                     <div class="flex flex-col lg:flex-row items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                         
-                        <!-- Playback Controls -->
+                        <!-- Playback Controls (UPDATED to +/- 1 word) -->
                         <div class="flex items-center gap-3">
-                            <button onclick="skipRsvp(-10)" class="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-full flex items-center justify-center transition-colors shadow-sm" title="Rewind 10 words">
-                                <i class="fas fa-undo"></i>
+                            <button onclick="skipRsvp(-1)" class="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-full flex items-center justify-center transition-colors shadow-sm" title="Previous word">
+                                <i class="fas fa-step-backward"></i>
                             </button>
                             <button id="rsvp-btn-play" onclick="toggleRsvp()" class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-transform hover:scale-105 shadow-md">
                                 <i class="fas fa-play text-xl ml-1" id="rsvp-play-icon"></i>
                             </button>
-                            <button onclick="skipRsvp(10)" class="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-full flex items-center justify-center transition-colors shadow-sm" title="Fast Forward 10 words">
-                                <i class="fas fa-redo"></i>
+                            <button onclick="skipRsvp(1)" class="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-full flex items-center justify-center transition-colors shadow-sm" title="Next word">
+                                <i class="fas fa-step-forward"></i>
                             </button>
                             <button onclick="resetRsvp()" class="w-8 h-8 text-slate-400 hover:text-slate-700 rounded-full flex items-center justify-center transition-colors ml-2" title="Restart to Beginning">
                                 <i class="fas fa-stop"></i>
@@ -264,7 +264,7 @@
             setupFileListener();
         }
 
-        // --- EXPORT APP LOGIC (Fix: Explicitly rewrite DOM text to prevent local storage overrides) ---
+        // --- EXPORT APP LOGIC ---
         function downloadAppInstance() {
             const clone = document.documentElement.cloneNode(true);
             
@@ -426,22 +426,18 @@
                     if (extractedText) {
                         totalExtractedFiles++;
                         
-                        // Check if the text box contains the default startup text
                         const hasDefaultText = sourceTextArea.value.includes('What do you think of when you think of plants?');
                         const isFirstProcessedFile = (totalExtractedFiles === 1);
 
                         if (isFirstProcessedFile && (sourceTextArea.value.trim() === '' || hasDefaultText)) {
-                            // Clear the placeholder text for the first imported document
                             sourceTextArea.value = filesArray.length > 1 ? `=== Document: ${file.name} ===\n\n` + extractedText : extractedText;
                         } else {
-                            // Append sequentially
                             const fileHeader = `\n\n=== Document: ${file.name} ===\n\n`;
                             sourceTextArea.value += fileHeader + extractedText;
                         }
                     }
                 }
                 
-                // Automatically scroll to the top of the newly imported text so you can see it
                 sourceTextArea.scrollTop = 0;
                 
                 if (tesseractWorker) await tesseractWorker.terminate();
@@ -677,6 +673,7 @@
             }
         }
 
+        // UPDATED: Now uses ORP (Optimal Recognition Point) styling for the RSVP display
         function updateRsvpUI(updateScrubber = true) {
             const displayWord = document.getElementById('rsvp-word');
             const tracker = document.getElementById('rsvp-tracker');
@@ -685,7 +682,7 @@
             const scrubberPercent = document.getElementById('scrubber-percent');
 
             if (words.length === 0) {
-                displayWord.innerText = "No text loaded";
+                displayWord.innerHTML = "No text loaded";
                 tracker.innerText = "0 / 0";
                 progress.style.width = "0%";
                 scrubber.max = 0;
@@ -695,7 +692,18 @@
             }
 
             const safeIndex = Math.min(rsvpIndex, words.length - 1);
-            displayWord.innerText = words[safeIndex];
+            const currentWord = words[safeIndex];
+            
+            // Calculate the Optimal Recognition Point (similar to the Bionic view)
+            let splitIndex = 1;
+            if (currentWord.length >= 3) splitIndex = Math.ceil(currentWord.length * 0.4);
+            if (currentWord.length >= 6) splitIndex = Math.ceil(currentWord.length * 0.5);
+
+            const boldPart = currentWord.substring(0, splitIndex);
+            const normalPart = currentWord.substring(splitIndex);
+
+            // Apply distinct colors to the word sections (bright blue for the focus point, muted gray for the rest)
+            displayWord.innerHTML = `<span class="text-blue-400 font-extrabold">${boldPart}</span><span class="text-slate-300 font-medium">${normalPart}</span>`;
             
             tracker.innerText = `${safeIndex + 1} / ${words.length}`;
             const pct = (safeIndex / (words.length > 1 ? words.length - 1 : 1)) * 100;
