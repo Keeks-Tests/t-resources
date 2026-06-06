@@ -266,6 +266,15 @@
 
         // --- EXPORT APP LOGIC ---
         function downloadAppInstance() {
+            // Prompt the user for a filename
+            let filename = prompt("Enter a name for your saved file:", "My_Reading_Practice");
+            if (filename === null) return; // Abort if user clicks Cancel
+            
+            // Ensure the filename is valid and ends with .html
+            filename = filename.trim();
+            if (filename === "") filename = "Custom_Speed_Reading_Hub";
+            if (!filename.toLowerCase().endsWith('.html')) filename += '.html';
+
             const clone = document.documentElement.cloneNode(true);
             
             // 1. Force the exact current text to be embedded natively
@@ -309,7 +318,7 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Custom_Speed_Reading_Hub.html';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
