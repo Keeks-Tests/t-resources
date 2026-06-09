@@ -118,6 +118,7 @@
                 <button onclick="switchTab('bionic')" id="tab-bionic" class="tab-active px-6 py-4 text-sm whitespace-nowrap focus:outline-none transition-colors"><i class="fas fa-eye mr-2"></i>Fixation Emphasis</button>
                 <button onclick="switchTab('chunking')" id="tab-chunking" class="tab-inactive px-6 py-4 text-sm whitespace-nowrap focus:outline-none transition-colors"><i class="fas fa-layer-group mr-2"></i>Chunking</button>
                 <button onclick="switchTab('rsvp')" id="tab-rsvp" class="tab-inactive px-6 py-4 text-sm whitespace-nowrap focus:outline-none transition-colors"><i class="fas fa-tachometer-alt mr-2"></i>RSVP Player</button>
+                <button onclick="switchTab('chunk-rsvp')" id="tab-chunk-rsvp" class="tab-inactive px-6 py-4 text-sm whitespace-nowrap focus:outline-none transition-colors"><i class="fas fa-fast-forward mr-2"></i>Chunk RSVP</button>
                 <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-inactive px-6 py-4 text-sm whitespace-nowrap focus:outline-none transition-colors"><i class="fas fa-check-circle mr-2"></i>Comprehension Quiz</button>
             </div>
 
@@ -231,6 +232,80 @@
                     </div>
                 </div>
 
+                <!-- Chunk RSVP View -->
+                <div id="view-chunk-rsvp" class="hidden">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-slate-800">Chunked RSVP Player</h2>
+                        <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full font-medium">Speed + Context</span>
+                    </div>
+                    <p class="text-slate-600 mb-6 text-sm">Combines Rapid Serial Visual Presentation with Chunking. Flashes groups of words at your target reading speed to improve both peripheral vision and pacing.</p>
+                    
+                    <div class="mb-4 flex items-center gap-2">
+                        <label class="text-sm text-slate-600 font-medium">Words per flash:</label>
+                        <select id="chunkRsvpSize" onchange="updateChunkRsvpSize()" class="border border-slate-300 rounded-md p-1.5 text-sm outline-none bg-white shadow-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="2">2 words</option>
+                            <option value="3" selected>3 words</option>
+                            <option value="4">4 words</option>
+                            <option value="5">5 words</option>
+                        </select>
+                    </div>
+
+                    <!-- Player Screen -->
+                    <div class="bg-slate-900 rounded-xl p-8 flex flex-col items-center justify-center min-h-[250px] relative shadow-inner mb-6">
+                        <div id="chunk-rsvp-word" class="text-3xl md:text-5xl font-bold text-white tracking-wide text-center min-h-[5rem] flex items-center justify-center w-full flex-wrap gap-x-4 gap-y-2 leading-tight">
+                            Ready?
+                        </div>
+                        
+                        <!-- Word Tracker -->
+                        <div id="chunk-rsvp-tracker" class="absolute top-4 right-5 text-slate-400 text-sm font-mono tracking-wider font-semibold">
+                            0 / 0
+                        </div>
+
+                        <!-- Mini Progress Bar inside screen -->
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-slate-700 rounded-b-xl overflow-hidden">
+                            <div id="chunk-rsvp-progress" class="h-full bg-blue-500 w-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- Scrubber / Dial for Position -->
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-4 shadow-sm">
+                        <div class="flex justify-between text-xs text-slate-500 mb-2 font-medium">
+                            <span>Reading Position Timeline</span>
+                            <span id="chunk-scrubber-percent">0%</span>
+                        </div>
+                        <input type="range" id="chunk-rsvp-scrubber" min="0" max="100" value="0" oninput="handleChunkScrubber()" onchange="handleChunkScrubberEnd()" class="w-full">
+                    </div>
+
+                    <!-- Controls Dashboard -->
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
+                        
+                        <!-- Playback Controls -->
+                        <div class="flex items-center gap-3">
+                            <button onclick="skipChunkRsvp(-1)" class="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-full flex items-center justify-center transition-colors shadow-sm" title="Previous chunk">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button id="chunk-rsvp-btn-play" onclick="toggleChunkRsvp()" class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-transform hover:scale-105 shadow-md">
+                                <i class="fas fa-play text-xl ml-1" id="chunk-rsvp-play-icon"></i>
+                            </button>
+                            <button onclick="skipChunkRsvp(1)" class="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-full flex items-center justify-center transition-colors shadow-sm" title="Next chunk">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                            <button onclick="resetChunkRsvp()" class="w-8 h-8 text-slate-400 hover:text-slate-700 rounded-full flex items-center justify-center transition-colors ml-2" title="Restart to Beginning">
+                                <i class="fas fa-stop"></i>
+                            </button>
+                        </div>
+
+                        <!-- Speed Slider -->
+                        <div class="flex-1 w-full lg:w-auto lg:border-l border-slate-300 lg:pl-6">
+                            <div class="flex justify-between text-xs text-slate-500 mb-2 font-medium">
+                                <span>Target Speed (WPM)</span>
+                                <span id="chunk-wpm-display" class="font-bold text-slate-800 bg-slate-200 px-2 py-0.5 rounded">300 WPM</span>
+                            </div>
+                            <input type="range" id="chunk-wpm-slider" min="100" max="1000" step="10" value="300" oninput="updateChunkSpeed()" class="w-full">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Quiz View -->
                 <div id="view-quiz" class="hidden">
                     <div class="mb-4 flex items-center justify-between">
@@ -259,6 +334,13 @@
         let bookmarkIndex = null;
         let isScrubbing = false;
 
+        let chunkRsvpIndex = 0;
+        let chunkRsvpInterval = null;
+        let chunkRsvpWpm = 300;
+        let isChunkRsvpPlaying = false;
+        let chunkRsvpChunks = [];
+        let isChunkRsvpScrubbing = false;
+
         function init() {
             updateAllViews();
             setupFileListener();
@@ -286,7 +368,7 @@
             }
 
             // 2. Reset the tabs so the Bionic view is always open on launch
-            const tabs = ['bionic', 'chunking', 'rsvp', 'quiz'];
+            const tabs = ['bionic', 'chunking', 'rsvp', 'chunk-rsvp', 'quiz'];
             tabs.forEach(t => {
                 const tabBtn = clone.querySelector('#tab-' + t);
                 const viewDiv = clone.querySelector('#view-' + t);
@@ -307,6 +389,9 @@
             
             const chunkingOut = clone.querySelector('#chunking-output');
             if(chunkingOut) chunkingOut.innerHTML = '';
+
+            const chunkRsvpOut = clone.querySelector('#chunk-rsvp-word');
+            if(chunkRsvpOut) chunkRsvpOut.innerHTML = 'Ready?';
 
             const fileInput = clone.querySelector('#fileInput');
             if(fileInput) fileInput.removeAttribute('value');
@@ -486,13 +571,15 @@
         // Tab Switching
         function switchTab(tabName) {
             if (tabName !== 'rsvp') pauseRsvp();
+            if (tabName !== 'chunk-rsvp') pauseChunkRsvp();
 
             document.getElementById('view-bionic').classList.add('hidden');
             document.getElementById('view-chunking').classList.add('hidden');
             document.getElementById('view-rsvp').classList.add('hidden');
+            document.getElementById('view-chunk-rsvp').classList.add('hidden');
             document.getElementById('view-quiz').classList.add('hidden');
             
-            const tabs = ['bionic', 'chunking', 'rsvp', 'quiz'];
+            const tabs = ['bionic', 'chunking', 'rsvp', 'chunk-rsvp', 'quiz'];
             tabs.forEach(t => {
                 const el = document.getElementById('tab-' + t);
                 if(el) {
@@ -524,6 +611,11 @@
             rsvpIndex = 0;
             updateBookmarkUI();
             updateRsvpUI();
+
+            generateChunkRsvpChunks();
+            pauseChunkRsvp();
+            chunkRsvpIndex = 0;
+            updateChunkRsvpUI();
         }
 
         // --- Bionic Reading Logic ---
@@ -557,9 +649,20 @@
 
             const size = parseInt(document.getElementById('chunkSize').value);
             let html = '';
-            for (let i = 0; i < words.length; i += size) {
-                const chunk = words.slice(i, i + size).join(' ');
-                html += `<span class="bg-slate-200 px-3 py-1 rounded shadow-sm">${chunk}</span>`;
+            let currentChunk = [];
+            
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+                currentChunk.push(word);
+                
+                // Check if the word ends with a sentence terminator (. ! ?) including trailing quotes
+                const isEndOfSentence = /[.!?]['"]*$/.test(word);
+                
+                // End the chunk if it reaches max size, is the end of a sentence, or is the last word
+                if (currentChunk.length >= size || isEndOfSentence || i === words.length - 1) {
+                    html += `<span class="bg-slate-200 px-3 py-1 rounded shadow-sm">${currentChunk.join(' ')}</span>`;
+                    currentChunk = [];
+                }
             }
             output.innerHTML = html;
         }
@@ -723,6 +826,162 @@
                 scrubber.value = safeIndex;
             }
             scrubberPercent.innerText = Math.round(pct) + '%';
+        }
+
+        // --- Chunk RSVP Logic ---
+        function generateChunkRsvpChunks() {
+            chunkRsvpChunks = [];
+            if (words.length === 0) return;
+            const size = parseInt(document.getElementById('chunkRsvpSize').value);
+            
+            let currentChunk = [];
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+                currentChunk.push(word);
+                
+                // Check if the word ends with a sentence terminator (. ! ?) including trailing quotes
+                const isEndOfSentence = /[.!?]['"]*$/.test(word);
+                
+                // End the chunk if it reaches max size, is the end of a sentence, or is the last word
+                if (currentChunk.length >= size || isEndOfSentence || i === words.length - 1) {
+                    chunkRsvpChunks.push(currentChunk.join(' '));
+                    currentChunk = [];
+                }
+            }
+        }
+
+        function updateChunkRsvpSize() {
+            generateChunkRsvpChunks();
+            pauseChunkRsvp();
+            chunkRsvpIndex = 0;
+            updateChunkRsvpUI();
+        }
+
+        function toggleChunkRsvp() {
+            if (chunkRsvpChunks.length === 0) return;
+            if (isChunkRsvpPlaying) {
+                pauseChunkRsvp();
+            } else {
+                if (chunkRsvpIndex >= chunkRsvpChunks.length) chunkRsvpIndex = 0;
+                playChunkRsvp();
+            }
+        }
+
+        function playChunkRsvp() {
+            isChunkRsvpPlaying = true;
+            const icon = document.getElementById('chunk-rsvp-play-icon');
+            icon.classList.remove('fa-play', 'ml-1');
+            icon.classList.add('fa-pause');
+            
+            const size = parseInt(document.getElementById('chunkRsvpSize').value);
+            // Calculate delay based on target WPM multiplied by the size of the chunk
+            const delayMs = (60000 / chunkRsvpWpm) * size;
+            
+            updateChunkRsvpUI();
+            
+            chunkRsvpInterval = setInterval(() => {
+                chunkRsvpIndex++;
+                if (chunkRsvpIndex >= chunkRsvpChunks.length) {
+                    pauseChunkRsvp();
+                    chunkRsvpIndex = chunkRsvpChunks.length - 1;
+                }
+                updateChunkRsvpUI();
+            }, delayMs);
+        }
+
+        function pauseChunkRsvp() {
+            isChunkRsvpPlaying = false;
+            clearInterval(chunkRsvpInterval);
+            const icon = document.getElementById('chunk-rsvp-play-icon');
+            if (icon) {
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play', 'ml-1');
+            }
+            updateChunkRsvpUI();
+        }
+
+        function resetChunkRsvp() {
+            pauseChunkRsvp();
+            chunkRsvpIndex = 0;
+            updateChunkRsvpUI();
+        }
+
+        function skipChunkRsvp(amount) {
+            chunkRsvpIndex += amount;
+            if (chunkRsvpIndex < 0) chunkRsvpIndex = 0;
+            if (chunkRsvpIndex >= chunkRsvpChunks.length) chunkRsvpIndex = chunkRsvpChunks.length - 1;
+            updateChunkRsvpUI();
+            if (isChunkRsvpPlaying) {
+                pauseChunkRsvp();
+                playChunkRsvp();
+            }
+        }
+
+        function handleChunkScrubber() {
+            isChunkRsvpScrubbing = true;
+            pauseChunkRsvp(); 
+            const scrubber = document.getElementById('chunk-rsvp-scrubber');
+            chunkRsvpIndex = parseInt(scrubber.value);
+            updateChunkRsvpUI(false); 
+        }
+
+        function handleChunkScrubberEnd() {
+            isChunkRsvpScrubbing = false;
+        }
+
+        function updateChunkSpeed() {
+            const slider = document.getElementById('chunk-wpm-slider');
+            chunkRsvpWpm = parseInt(slider.value);
+            document.getElementById('chunk-wpm-display').innerText = chunkRsvpWpm + ' WPM';
+            if (isChunkRsvpPlaying) {
+                pauseChunkRsvp();
+                playChunkRsvp();
+            }
+        }
+
+        function updateChunkRsvpUI(updateScrubber = true) {
+            const displayWord = document.getElementById('chunk-rsvp-word');
+            const tracker = document.getElementById('chunk-rsvp-tracker');
+            const progress = document.getElementById('chunk-rsvp-progress');
+            const scrubber = document.getElementById('chunk-rsvp-scrubber');
+            const scrubberPercent = document.getElementById('chunk-scrubber-percent');
+
+            if (chunkRsvpChunks.length === 0) {
+                displayWord.innerHTML = "No text loaded";
+                tracker.innerText = "0 / 0";
+                progress.style.width = "0%";
+                if(scrubber) { scrubber.max = 0; scrubber.value = 0; }
+                if(scrubberPercent) scrubberPercent.innerText = "0%";
+                return;
+            }
+
+            const safeIndex = Math.min(chunkRsvpIndex, chunkRsvpChunks.length - 1);
+            const currentChunkStr = chunkRsvpChunks[safeIndex];
+            
+            // Apply ORP (Optimal Recognition Point) styling to each word in the chunk
+            const chunkWords = currentChunkStr.split(' ');
+            const formattedWords = chunkWords.map(word => {
+                let splitIndex = 1;
+                if (word.length >= 3) splitIndex = Math.ceil(word.length * 0.4);
+                if (word.length >= 6) splitIndex = Math.ceil(word.length * 0.5);
+
+                const boldPart = word.substring(0, splitIndex);
+                const normalPart = word.substring(splitIndex);
+
+                return `<span class="whitespace-nowrap"><span class="text-blue-400 font-extrabold">${boldPart}</span><span class="text-slate-300 font-medium">${normalPart}</span></span>`;
+            });
+
+            displayWord.innerHTML = formattedWords.join(' ');
+            
+            tracker.innerText = `${safeIndex + 1} / ${chunkRsvpChunks.length}`;
+            const pct = (safeIndex / (chunkRsvpChunks.length > 1 ? chunkRsvpChunks.length - 1 : 1)) * 100;
+            progress.style.width = `${pct}%`;
+            
+            if (updateScrubber && !isChunkRsvpScrubbing && scrubber) {
+                scrubber.max = chunkRsvpChunks.length - 1;
+                scrubber.value = safeIndex;
+            }
+            if(scrubberPercent) scrubberPercent.innerText = Math.round(pct) + '%';
         }
 
         window.onload = init;
