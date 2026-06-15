@@ -223,11 +223,11 @@
 
                         <!-- Speed Slider -->
                         <div class="flex-1 w-full lg:w-auto lg:border-l border-slate-300 lg:pl-6">
-                            <div class="flex justify-between text-xs text-slate-500 mb-2 font-medium">
+                            <div class="flex justify-between items-center text-xs text-slate-500 mb-2 font-medium">
                                 <span>Speed Setting (WPM)</span>
-                                <span id="wpm-display" class="font-bold text-slate-800 bg-slate-200 px-2 py-0.5 rounded">300 WPM</span>
+                                <input type="number" id="wpm-input" min="10" max="2000" step="10" value="300" onchange="syncSpeed('input', 'rsvp')" class="font-bold text-slate-800 bg-slate-200 px-2 py-0.5 rounded w-20 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner">
                             </div>
-                            <input type="range" id="wpm-slider" min="100" max="1000" step="10" value="300" oninput="updateSpeed()" class="w-full">
+                            <input type="range" id="wpm-slider" min="10" max="2000" step="10" value="300" oninput="syncSpeed('slider', 'rsvp')" class="w-full">
                         </div>
                     </div>
                 </div>
@@ -297,11 +297,11 @@
 
                         <!-- Speed Slider -->
                         <div class="flex-1 w-full lg:w-auto lg:border-l border-slate-300 lg:pl-6">
-                            <div class="flex justify-between text-xs text-slate-500 mb-2 font-medium">
+                            <div class="flex justify-between items-center text-xs text-slate-500 mb-2 font-medium">
                                 <span>Target Speed (WPM)</span>
-                                <span id="chunk-wpm-display" class="font-bold text-slate-800 bg-slate-200 px-2 py-0.5 rounded">300 WPM</span>
+                                <input type="number" id="chunk-wpm-input" min="10" max="2000" step="10" value="300" onchange="syncSpeed('input', 'chunk')" class="font-bold text-slate-800 bg-slate-200 px-2 py-0.5 rounded w-20 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner">
                             </div>
-                            <input type="range" id="chunk-wpm-slider" min="100" max="1000" step="10" value="300" oninput="updateChunkSpeed()" class="w-full">
+                            <input type="range" id="chunk-wpm-slider" min="10" max="2000" step="10" value="300" oninput="syncSpeed('slider', 'chunk')" class="w-full">
                         </div>
                     </div>
                 </div>
@@ -739,13 +739,40 @@
             isScrubbing = false;
         }
 
-        function updateSpeed() {
-            const slider = document.getElementById('wpm-slider');
-            wpm = parseInt(slider.value);
-            document.getElementById('wpm-display').innerText = wpm + ' WPM';
-            if (isPlaying) {
-                pauseRsvp();
-                playRsvp();
+        function syncSpeed(source, type) {
+            let newVal;
+            if (type === 'rsvp') {
+                if (source === 'slider') {
+                    newVal = parseInt(document.getElementById('wpm-slider').value);
+                    document.getElementById('wpm-input').value = newVal;
+                } else {
+                    newVal = parseInt(document.getElementById('wpm-input').value);
+                    if (isNaN(newVal) || newVal < 10) newVal = 10;
+                    if (newVal > 2000) newVal = 2000;
+                    document.getElementById('wpm-input').value = newVal;
+                    document.getElementById('wpm-slider').value = newVal;
+                }
+                wpm = newVal;
+                if (isPlaying) {
+                    pauseRsvp();
+                    playRsvp();
+                }
+            } else if (type === 'chunk') {
+                if (source === 'slider') {
+                    newVal = parseInt(document.getElementById('chunk-wpm-slider').value);
+                    document.getElementById('chunk-wpm-input').value = newVal;
+                } else {
+                    newVal = parseInt(document.getElementById('chunk-wpm-input').value);
+                    if (isNaN(newVal) || newVal < 10) newVal = 10;
+                    if (newVal > 2000) newVal = 2000;
+                    document.getElementById('chunk-wpm-input').value = newVal;
+                    document.getElementById('chunk-wpm-slider').value = newVal;
+                }
+                chunkRsvpWpm = newVal;
+                if (isChunkRsvpPlaying) {
+                    pauseChunkRsvp();
+                    playChunkRsvp();
+                }
             }
         }
 
@@ -927,16 +954,6 @@
 
         function handleChunkScrubberEnd() {
             isChunkRsvpScrubbing = false;
-        }
-
-        function updateChunkSpeed() {
-            const slider = document.getElementById('chunk-wpm-slider');
-            chunkRsvpWpm = parseInt(slider.value);
-            document.getElementById('chunk-wpm-display').innerText = chunkRsvpWpm + ' WPM';
-            if (isChunkRsvpPlaying) {
-                pauseChunkRsvp();
-                playChunkRsvp();
-            }
         }
 
         function updateChunkRsvpUI(updateScrubber = true) {
