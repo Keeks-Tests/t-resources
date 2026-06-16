@@ -252,7 +252,8 @@
 
                     <!-- Player Screen -->
                     <div class="bg-slate-900 rounded-xl p-8 flex flex-col items-center justify-center min-h-[250px] relative shadow-inner mb-6">
-                        <div id="chunk-rsvp-word" class="text-3xl md:text-5xl font-bold text-white tracking-wide text-center min-h-[5rem] flex items-center justify-center w-full flex-wrap gap-x-4 gap-y-2 leading-tight">
+                        <!-- Updated class: whitespace-nowrap and overflow-hidden guarantees no lines ever wrap -->
+                        <div id="chunk-rsvp-word" class="text-3xl md:text-5xl font-bold text-white tracking-wide text-center h-20 flex items-center justify-center w-full whitespace-nowrap overflow-hidden">
                             Ready?
                         </div>
                         
@@ -344,6 +345,23 @@
         function init() {
             updateAllViews();
             setupFileListener();
+
+            // Handle window resizing for responsive chunk calculation
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (words.length > 0 && !document.getElementById('view-chunk-rsvp').classList.contains('hidden')) {
+                        const wasPlaying = isChunkRsvpPlaying;
+                        if (wasPlaying) pauseChunkRsvp();
+                        
+                        generateChunkRsvpChunks();
+                        updateChunkRsvpUI(false);
+                        
+                        if (wasPlaying) playChunkRsvp();
+                    }
+                }, 250);
+            });
         }
 
         // --- EXPORT APP LOGIC ---
@@ -855,15 +873,34 @@
             scrubberPercent.innerText = Math.round(pct) + '%';
         }
 
-        // --- Chunk RSVP Logic ---
+        // --- Chunk RSVP Logic (UPDATED: Dynamically checks text width so it never wraps) ---
         function generateChunkRsvpChunks() {
             chunkRsvpChunks = [];
             if (words.length === 0) return;
             const size = parseInt(document.getElementById('chunkRsvpSize').value);
             
+            // Setup hidden element to measure text width accurately against the screen
+            const rsvpScreen = document.getElementById('chunk-rsvp-word').parentElement;
+            const maxWidth = rsvpScreen.clientWidth * 0.85; // Uses 85% of screen width to safely guarantee no wrapping
+            
+            const measureDiv = document.createElement('div');
+            measureDiv.className = "text-3xl md:text-5xl font-bold tracking-wide whitespace-nowrap absolute invisible pointer-events-none";
+            document.body.appendChild(measureDiv);
+            
             let currentChunk = [];
             for (let i = 0; i < words.length; i++) {
                 const word = words[i];
+                
+                // Check if adding this word forces the text to overflow past the screen container
+                if (currentChunk.length > 0) {
+                    measureDiv.innerText = currentChunk.join(' ') + ' ' + word;
+                    if (measureDiv.clientWidth > maxWidth) {
+                        // It's too wide! Seal the chunk early without this word to prevent multi-line wrapping
+                        chunkRsvpChunks.push(currentChunk.join(' '));
+                        currentChunk = []; 
+                    }
+                }
+                
                 currentChunk.push(word);
                 
                 // Check if the word ends with a sentence terminator (. ! ?) including trailing quotes
@@ -871,10 +908,15 @@
                 
                 // End the chunk if it reaches max size, is the end of a sentence, or is the last word
                 if (currentChunk.length >= size || isEndOfSentence || i === words.length - 1) {
-                    chunkRsvpChunks.push(currentChunk.join(' '));
-                    currentChunk = [];
+                    if (currentChunk.length > 0) {
+                        chunkRsvpChunks.push(currentChunk.join(' '));
+                        currentChunk = [];
+                    }
                 }
             }
+            
+            // Clean up invisible measuring element
+            document.body.removeChild(measureDiv);
         }
 
         function updateChunkRsvpSize() {
