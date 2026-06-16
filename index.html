@@ -1006,7 +1006,7 @@
             const scrubberPercent = document.getElementById('chunk-scrubber-percent');
 
             if (chunkRsvpChunks.length === 0) {
-                displayWord.innerHTML = "No text loaded";
+                displayWord.innerHTML = "<span>No text loaded</span>";
                 tracker.innerText = "0 / 0";
                 progress.style.width = "0%";
                 if(scrubber) { scrubber.max = 0; scrubber.value = 0; }
@@ -1030,7 +1030,8 @@
                 return `<span class="whitespace-nowrap"><span class="text-blue-400 font-extrabold">${boldPart}</span><span class="text-slate-300 font-medium">${normalPart}</span></span>`;
             });
 
-            displayWord.innerHTML = formattedWords.join(' ');
+            // Wrap everything in a single span so the CSS Flexbox container doesn't swallow the spaces
+            displayWord.innerHTML = `<span>${formattedWords.join(' ')}</span>`;
             
             tracker.innerText = `${safeIndex + 1} / ${chunkRsvpChunks.length}`;
             const pct = (safeIndex / (chunkRsvpChunks.length > 1 ? chunkRsvpChunks.length - 1 : 1)) * 100;
