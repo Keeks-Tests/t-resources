@@ -174,7 +174,7 @@
                         
                         <!-- Word Tracker -->
                         <div id="rsvp-tracker" class="absolute top-4 right-5 text-slate-400 text-sm font-mono tracking-wider font-semibold">
-                            0 / 0
+                            00:00:00 / 00:00:00
                         </div>
 
                         <!-- Mini Progress Bar inside screen -->
@@ -259,7 +259,7 @@
                         
                         <!-- Word Tracker -->
                         <div id="chunk-rsvp-tracker" class="absolute top-4 right-5 text-slate-400 text-sm font-mono tracking-wider font-semibold">
-                            0 / 0
+                            00:00:00 / 00:00:00
                         </div>
 
                         <!-- Mini Progress Bar inside screen -->
@@ -342,6 +342,15 @@
         let chunkRsvpChunks = [];
         let isChunkRsvpScrubbing = false;
 
+        // Helper function to format minutes into HH:MM:SS
+        function formatTime(minutes) {
+            if (!minutes || isNaN(minutes) || !isFinite(minutes)) return "00:00:00";
+            const h = Math.floor(minutes / 60);
+            const m = Math.floor(minutes % 60);
+            const s = Math.floor((minutes * 60) % 60);
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
         function init() {
             updateAllViews();
             setupFileListener();
@@ -362,6 +371,56 @@
                     }
                 }, 250);
             });
+
+            setupKeyboardAndTouchNavigation();
+        }
+
+        function setupKeyboardAndTouchNavigation() {
+            // 1. Keyboard Navigation (Arrow Keys & Spacebar)
+            window.addEventListener('keydown', (e) => {
+                // Ignore key presses if the user is typing in a text area or input field
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+                const isRsvpActive = !document.getElementById('view-rsvp').classList.contains('hidden');
+                const isChunkRsvpActive = !document.getElementById('view-chunk-rsvp').classList.contains('hidden');
+
+                if (isRsvpActive) {
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); skipRsvp(-1); }
+                    if (e.key === 'ArrowRight') { e.preventDefault(); skipRsvp(1); }
+                    if (e.key === ' ') { e.preventDefault(); toggleRsvp(); }
+                } else if (isChunkRsvpActive) {
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); skipChunkRsvp(-1); }
+                    if (e.key === 'ArrowRight') { e.preventDefault(); skipChunkRsvp(1); }
+                    if (e.key === ' ') { e.preventDefault(); toggleChunkRsvp(); }
+                }
+            });
+
+            // 2. Touch Swipe Navigation for Mobile Devices
+            const rsvpScreen = document.getElementById('rsvp-word').parentElement;
+            setupSwipeListener(rsvpScreen, skipRsvp);
+
+            const chunkRsvpScreen = document.getElementById('chunk-rsvp-word').parentElement;
+            setupSwipeListener(chunkRsvpScreen, skipChunkRsvp);
+        }
+
+        function setupSwipeListener(element, skipFn) {
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            element.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            element.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const swipeThreshold = 40; // Minimum pixel distance for a valid swipe
+                if (touchEndX < touchStartX - swipeThreshold) skipFn(1); // Swiped left -> Step Forward
+                if (touchEndX > touchStartX + swipeThreshold) skipFn(-1); // Swiped right -> Step Backward
+            }
         }
 
         // --- EXPORT APP LOGIC ---
@@ -771,6 +830,7 @@
                     document.getElementById('wpm-slider').value = newVal;
                 }
                 wpm = newVal;
+                updateRsvpUI(false); // Update time display immediately
                 if (isPlaying) {
                     pauseRsvp();
                     playRsvp();
@@ -787,6 +847,7 @@
                     document.getElementById('chunk-wpm-slider').value = newVal;
                 }
                 chunkRsvpWpm = newVal;
+                updateChunkRsvpUI(false); // Update time display immediately
                 if (isChunkRsvpPlaying) {
                     pauseChunkRsvp();
                     playChunkRsvp();
@@ -840,7 +901,7 @@
 
             if (words.length === 0) {
                 displayWord.innerHTML = "No text loaded";
-                tracker.innerText = "0 / 0";
+                tracker.innerText = "00:00:00 / 00:00:00";
                 progress.style.width = "0%";
                 scrubber.max = 0;
                 scrubber.value = 0;
@@ -862,7 +923,10 @@
             // Apply distinct colors to the word sections (bright blue for the focus point, muted gray for the rest)
             displayWord.innerHTML = `<span class="text-blue-400 font-extrabold">${boldPart}</span><span class="text-slate-300 font-medium">${normalPart}</span>`;
             
-            tracker.innerText = `${safeIndex + 1} / ${words.length}`;
+            const totalMinutes = words.length / wpm;
+            const currentMinutes = (safeIndex + 1) / wpm;
+            tracker.innerText = `${formatTime(currentMinutes)} / ${formatTime(totalMinutes)}`;
+            
             const pct = (safeIndex / (words.length > 1 ? words.length - 1 : 1)) * 100;
             progress.style.width = `${pct}%`;
             
@@ -1007,7 +1071,7 @@
 
             if (chunkRsvpChunks.length === 0) {
                 displayWord.innerHTML = "<span>No text loaded</span>";
-                tracker.innerText = "0 / 0";
+                tracker.innerText = "00:00:00 / 00:00:00";
                 progress.style.width = "0%";
                 if(scrubber) { scrubber.max = 0; scrubber.value = 0; }
                 if(scrubberPercent) scrubberPercent.innerText = "0%";
@@ -1033,7 +1097,11 @@
             // Wrap everything in a single span so the CSS Flexbox container doesn't swallow the spaces
             displayWord.innerHTML = `<span>${formattedWords.join(' ')}</span>`;
             
-            tracker.innerText = `${safeIndex + 1} / ${chunkRsvpChunks.length}`;
+            const size = parseInt(document.getElementById('chunkRsvpSize').value) || 3;
+            const totalMinutes = (chunkRsvpChunks.length * size) / chunkRsvpWpm;
+            const currentMinutes = ((safeIndex + 1) * size) / chunkRsvpWpm;
+            tracker.innerText = `${formatTime(currentMinutes)} / ${formatTime(totalMinutes)}`;
+            
             const pct = (safeIndex / (chunkRsvpChunks.length > 1 ? chunkRsvpChunks.length - 1 : 1)) * 100;
             progress.style.width = `${pct}%`;
             
